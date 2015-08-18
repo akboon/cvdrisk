@@ -1,0 +1,61 @@
+doctype
+html(lang="en")
+  head
+    meta(charset="utf-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1")
+    title CVD Risk for HOSxP and HOSxP_PCU
+    link(rel="stylesheet", href="../../vendor/metro/build/css/metro.min.css")
+    link(rel="stylesheet", href="../../vendor/metro/build/css/metro-icons.min.css")
+    link(rel="stylesheet", href="../css/index.css")
+    
+    script(src="../../vendor/jquery/dist/jquery.min.js")
+    script(src="../../vendor/datatables/media/js/jquery.dataTables.min.js")
+    script(src="../../vendor/metro/build/js/metro.js")
+
+    script(src="../js/app.js")
+    
+    block scripts
+    
+  body
+    div.app-bar(data-role="appbar")
+      a.app-bar-element(href="#")
+        span.mif-apps.mif-2x 
+        | &nbsp; CVD Risk App
+      span.app-bar-divider
+      ul.app-bar-menu
+        li
+          a(href="#")
+            span.mif-users.mif-2x 
+            | &nbsp;ผู้มารับบริการ
+        li
+          a(href="#").dropdown-toggle
+            span.mif-books.mif-2x 
+            | &nbsp; ทะเบียน
+          ul.d-menu(data-role="dropdown")
+            li
+              a(href="#")
+                span.mif-stack2.mif-lg 
+                | &nbsp; ทะเบียนผู้ป่วยเบาหวาน
+            li
+              a(href="#")
+                span.mif-stack3.mif-lg 
+                | &nbsp; ทะเบียนผู้ป่วยความดันโลหิต
+        li
+          a(href="#").dropdown-toggle
+            span.mif-tools.mif-2x 
+            | &nbsp; Tools
+          ul.d-menu(data-role="dropdown")
+            li
+              a(href="#")
+                span.mif-flow-tree.mif-lg 
+                | &nbsp; Lab Mapper
+            li
+              a(href="#")
+                span.mif-database.mif-lg 
+                | &nbsp; Connection Setting
+            li.divider
+            li
+              a(href="#")
+                span.mif-cabinet.mif-lg 
+                | &nbsp; Export Dataset
+    block content
