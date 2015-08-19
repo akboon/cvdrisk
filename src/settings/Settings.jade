@@ -1,0 +1,56 @@
+extends ../layouts/Main
+
+block content
+	ul.breadcrumbs2
+		li
+			a(href="#")
+				span.icon.mif-home
+		li
+			a(href="../main/App.html") การให้บริการ
+		li
+			a(href="#") กำหนดค่าการเชื่อมต่อ
+
+	.grid
+			.row
+				.cell.padding10
+					h1
+						| Connection setting
+						small &nbsp; เชื่อมต่อฐานข้อมูล
+					hr.bg-green
+	.flex-grid
+			.row
+				.cell.size6
+					.flex-grid
+						.row
+							.cell.size10
+								label ที่อยู่เครื่องแม่ (Host)
+								.input-control.text.full-size
+									input(type="text")
+							.cell.size2
+								label พอร์ต (Port)
+								.input-control.text.full-size
+									input(type="number")
+			.row
+				.cell.size6
+					label ฐานข้อมูล (Database)
+					.input-control.text.full-size
+						input(type="text")
+				.cell.colspan3 &nbsp;
+
+			.row
+				.cell.size6
+					.flex-grid
+						.row
+							.cell.size6
+								label ชื่อผู้ใช้งาน (Username)
+								.input-control.text.full-size
+									input(type="text")
+							.cell.size6
+								label รหัสผ่าน (Password)
+								.input-control.text.full-size
+									input(type="password")
+			.row
+				.cell.size6
+					button.button.success บันทึก 
+					&nbsp;
+					button.button ย้อนกลับ

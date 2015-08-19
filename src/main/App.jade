@@ -2,9 +2,9 @@ extends ../layouts/Main
 
 block content
   div.grid
-    div.row.cells4
-      div.cell.padding10.colspan2
-        | วันที่ &nbsp;
+    div.row
+      div.cell(style="text-align: center;")
+        | วันที่รับบริการ &nbsp;
         div.input-control.text(data-role="datepicker", data-format="dd/mm/yyyy", data-locale="th")
           input(type="text")
           button.button
@@ -16,11 +16,11 @@ block content
           input(type="checkbox", checked="checked")
           span.check
           span.caption &nbsp;&nbsp;ผู้ป่วยเรื้อรัง
-      div.cell.padding10.colspan2.place-right
-        div.input-control.text(style="width: 350px;", data-role="input")
-          input(type="text", placeholder="ค้นหาผู้มารับบริการ...")
-          button.button
-            span.mif-search
+      //- div.cell.padding10.colspan2.place-right
+      //-   div.input-control.text(style="width: 350px;", data-role="input")
+      //-     input(type="text", placeholder="ค้นหาผู้มารับบริการ...")
+      //-     button.button
+      //-       span.mif-search
     div.row
       div.cell.padding10
         table.table.striped.hovered.dataTable#tblVisit
