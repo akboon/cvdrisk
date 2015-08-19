@@ -28,3 +28,8 @@
         width: 1170px
     }
 }
+
+.tabcontrol .frames .frame {
+    background-color: #ffffff;
+    padding: 5px;
+}

@@ -3,10 +3,10 @@ var fse = require('fs-extra');
 var fs = require('fs');
 var path = require('path');
 
-var HOME_PATH = getHomePath();
+var homePath = getHomePath();
 
 // Check configure path exists
-var configPath = path.join(HOME_PATH, 'cvdrisk');
+var configPath = path.join(homePath, 'cvdrisk');
 fse.ensureDirSync(configPath);
 
 // Check configure file exists
@@ -27,20 +27,3 @@ fs.access(configFile, fs.W_OK, function (err) {
     fse.writeJsonSync(configFile, defaultConfig);
   }
 });
-
-$(function () {
-  $('#tblVisit').DataTable( {
-        "order": [[ 3, "desc" ]],
-        language: {
-          searchPlaceholder: "คำที่ต้องการค้นหา...",
-          search: "ค้นหา",
-          "paginate": {
-            "next": "&gt;",
-            "previous": "&lt"
-          },
-          "emptyTable": "ไม่พบข้อมูล",
-          "info": "แสดงหน้า _PAGE_ จาก _PAGES_",
-          "loadingRecords": "กรุณารอซักครู่..."
-        }
-    } );
-})

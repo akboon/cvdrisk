@@ -1,0 +1,69 @@
+extends ../layouts/Main
+
+block scripts 
+  script(src="Detail.js")
+  
+block content
+
+  ul.breadcrumbs2
+    li
+      a(href="../main/Main.html")
+        span.icon.mif-home
+    li
+      a(href="../main/Main.html") การให้บริการ
+    li
+      a(href="#") ข้อมูลการให้บริการ
+      
+  .grid
+    .row.cells5
+      .cell
+        .panel
+          .heading
+            span.icon.mif-home
+            span.title ข้อมูลผู้รับบริการ
+            
+          .content
+            p 
+              strong HN: &nbsp;
+              span#txtHN
+            p 
+              strong CID: &nbsp;
+              span#txtCID
+            p 
+              strong ชื่อ: &nbsp;
+              span#txtFullname
+              
+            p 
+              strong วันเกิด: &nbsp;
+              span#txtBirth
+            p
+              strong อายุ: 
+              span#txtAge
+              | &nbsp; (ปี)
+              strong &nbsp;เพศ: &nbsp;
+              span#txtSex
+            p
+              strong Typearea: 
+              span#txtTypearea
+              
+      .cell.colspan4
+        .tabcontrol
+          ul.tabs
+            li
+              a(href="#tabDiagnosis") การวินิจฉัย
+            li
+              a(href="#tabProcedure") หัตถการ
+            li
+              a(href="#tabDrugs") เวชภัณฑ์
+            li
+              a(href="#tabCharges") ค่าใช้จ่าย
+          .frames
+            .frame#tabDiagnosis
+              table.table.striped.hovered.dataTable#tblDiagnosis
+            .frame#tabProcedure
+              table.table.striped.hovered.dataTable#tblProcedures
+            .frame#tabDrugs
+              table.table.striped.hovered.dataTable#tblDrugs
+            .frame#tabCharges
+              table.table.striped.hovered.dataTable#tblCharges
+              
