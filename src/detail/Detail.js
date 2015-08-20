@@ -1,4 +1,7 @@
 $(function () {
+
+  $('#myStat').circliful();
+
   var Q = require('q');
   var fse = require('fs-extra');
   var moment = require('moment');
@@ -195,6 +198,42 @@ $(function () {
 
   }, function (err) {
     console.log(err);
+  });
+
+  var history = [
+    {date_serv: '12/08/2558', age: 45, sbp: 124, cho: 12.5, dm: 'Y', smoke: 'Y'},
+    {date_serv: '15/08/2558', age: 65, sbp: 124, cho: 12.5, dm: 'N', smoke: 'N'},
+    {date_serv: '19/09/2558', age: 50, sbp: 130, cho: 12.5, dm: 'Y', smoke: 'Y'}
+  ];
+
+  $('#tblHistory').DataTable({
+    data: history,
+    columns: [
+      { data: 'date_serv', title: 'วันที่' },
+      { data: 'age', title: 'อายุ(ปี)' },
+      { data: 'sbp', title: 'ความดัน' },
+      { data: 'cho', title: 'Cholesteral' },
+      { data: 'dm', title: 'เบาหวาน' },
+      { data: 'smoke', title: 'สูบบุหรี่' }
+    ],
+    // "columnDefs": [ {
+    //   "targets": 6,
+    //   "data": null,
+    //   "defaultContent": '<button class="button warning"><span class="mif mif-eye"></span></button>'
+    // }],
+    "paging": true,
+    "info": true,
+    "searching": false,
+    language: {
+      "paginate": {
+        "next": "&gt;",
+        "previous": "&lt"
+      },
+      "emptyTable": "ไม่พบข้อมูล",
+      "info": "แสดงหน้า _PAGE_ จาก _PAGES_",
+      "loadingRecords": "กรุณารอซักครู่...",
+      "lengthMenu": "แสดง _MENU_ เรคอร์ด"
+    }
   });
 
   // initial tabs

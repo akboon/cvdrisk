@@ -15,6 +15,7 @@
   ],
   "dependencies": {
     "metro": "~3.0.9",
-    "datatables": "~1.10.8"
+    "datatables": "~1.10.8",
+    "circliful": "~0.1.5"
   }
 }

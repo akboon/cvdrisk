@@ -4,7 +4,6 @@ block scripts
   script(src="Detail.js")
   
 block content
-
   ul.breadcrumbs2
     li
       a(href="../main/Main.html")
@@ -13,7 +12,7 @@ block content
       a(href="../main/Main.html") การให้บริการ
     li
       a(href="#") ข้อมูลการให้บริการ
-      
+
   .grid
     .row.cells5
       .cell
@@ -47,8 +46,12 @@ block content
               span#txtTypearea
               
       .cell.colspan4
+        //- .progress.large(data-parts="true", data-role="progressBar", data-value="30", data-colors='{"bg-red": 33, "bg-yellow": 66, "bg-cyan": 90, "bg-green": 100}')
+
         .tabcontrol
           ul.tabs
+            li
+              a(href="#tabCVDRisk") CVD Risk
             li
               a(href="#tabDiagnosis") การวินิจฉัย
             li
@@ -58,6 +61,51 @@ block content
             li
               a(href="#tabCharges") ค่าใช้จ่าย
           .frames
+            .frame#tabCVDRisk
+              .grid
+                .row.cells3
+                  .cell.colspan2
+                    .panel
+                      .heading
+                        span.icon.mif-display
+                        span.title ข้อมูลการรับบริการ
+                        
+                      .content(style="background-color: white;")
+                        .grid
+                          .row.cells3
+                            .cell
+                              label วันที่
+                              .input-control.text.full-size
+                                input(type="text", value="20/08/2558")
+                            .cell.colspan2
+                              label คลินิก
+                              .input-control.text.full-size
+                                input(type="text", value="แผนกผู้ป่วนนอก")
+                          .row.cells2
+                            .cell
+                              label แพทย์ผู้ตรวจ
+                              .input-control.text.full-size
+                                input(type="text", value="นายแพทย์ประสิทธิ์ มิ่งสุข")
+                            .cell
+                              label สิทธิ์การรักษา
+                              .input-control.text.full-size
+                                input(type="text", value="บัตรประกันสุขภาพ 30 บาท")
+                        h3
+                          | ประวัติการรับบริการ
+                        hr.bg-green
+                                
+                        table.table.striped.hovered.dataTable#tblHistory
+                  .cell
+                    .panel
+                      .heading
+                        span.icon.mif-chart-bars
+                        span.title การประมวลผล CVD Risk
+                        
+                      .content(style="background-color: white;")
+                        div#myStat(data-dimension="250", data-text="<10%", data-info="เสี่ยงต่ำ", 
+                        data-width="30", data-fontsize="38", data-percent="20", data-fgcolor="#00C853", 
+                        data-bgcolor="#eee",  data-total="100", 
+                        data-icon="long-arrow-up", data-icon-size="28", data-icon-color="#fff")
             .frame#tabDiagnosis
               table.table.striped.hovered.dataTable#tblDiagnosis
             .frame#tabProcedure
