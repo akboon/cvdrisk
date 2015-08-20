@@ -43,7 +43,11 @@ block content
               span#txtSex
             p
               strong Typearea: 
-              span#txtTypearea
+              p
+                span#txtTypearea
+            p
+              strong ผู้ป่วยเรื้อรัง: 
+              span.bg-magenta.fg-white#txtChronic
               
       .cell.colspan4
         //- .progress.large(data-parts="true", data-role="progressBar", data-value="30", data-colors='{"bg-red": 33, "bg-yellow": 66, "bg-cyan": 90, "bg-green": 100}')
@@ -60,6 +64,8 @@ block content
               a(href="#tabDrugs") เวชภัณฑ์
             li
               a(href="#tabCharges") ค่าใช้จ่าย
+            li
+              a(href="#tabLabs") ผลตรวจห้องปฏิบัติการ
           .frames
             .frame#tabCVDRisk
               .grid
@@ -76,36 +82,60 @@ block content
                             .cell
                               label วันที่
                               .input-control.text.full-size
-                                input(type="text", value="20/08/2558")
+                                input(type="text", disabled="disabled")#txtDateServ
                             .cell.colspan2
                               label คลินิก
                               .input-control.text.full-size
-                                input(type="text", value="แผนกผู้ป่วนนอก")
+                                input(type="text", disabled="disabled")#txtClinic
                           .row.cells2
                             .cell
                               label แพทย์ผู้ตรวจ
                               .input-control.text.full-size
-                                input(type="text", value="นายแพทย์ประสิทธิ์ มิ่งสุข")
+                                input(type="text", disabled="disabled")#txtDoctor
                             .cell
                               label สิทธิ์การรักษา
                               .input-control.text.full-size
-                                input(type="text", value="บัตรประกันสุขภาพ 30 บาท")
+                                input(type="text", disabled="disabled")#txtPttype
+                          .row
+                            .cell
+                              label การวินิจฉัย
+                              .input-control.text.full-size
+                                input(type="text", disabled="disabled")#txtDiag
                         h3
                           | ประวัติการรับบริการ
                         hr.bg-green
                                 
                         table.table.striped.hovered.dataTable#tblHistory
                   .cell
-                    .panel
-                      .heading
-                        span.icon.mif-chart-bars
-                        span.title การประมวลผล CVD Risk
-                        
-                      .content(style="background-color: white;")
-                        div#myStat(data-dimension="250", data-text="<10%", data-info="เสี่ยงต่ำ", 
-                        data-width="30", data-fontsize="38", data-percent="20", data-fgcolor="#00C853", 
-                        data-bgcolor="#eee",  data-total="100", 
-                        data-icon="long-arrow-up", data-icon-size="28", data-icon-color="#fff")
+                    .grid
+                      .row
+                        .cell
+                          .panel.collapsible(data-role="panel")
+                            .heading
+                              span.icon.mif-chart-bars
+                              span.title การประมวลผล CVD Risk
+                              
+                            .content(style="background-color: white;")
+                              table.table.dataTable#tblCurrentCVDChart
+                              div#cvdChart(data-dimension="250", data-text="<10%", data-info="เสี่ยงต่ำ", 
+                              data-width="30", data-fontsize="38", data-percent="20", data-fgcolor="#00C853", 
+                              data-bgcolor="#eee",  data-total="100", 
+                              data-icon="long-arrow-up", data-icon-size="28", data-icon-color="#fff")
+                      .row
+                        .cell
+                          .panel.collapsible(data-role="panel")
+                            .heading
+                              span.icon.mif-chart-bars
+                              span.title ค่า eGFR: CKD-EPI
+                            
+                            .content(style="background-color: white;")
+                              table.table.dataTable#tblCurrentGFRState
+                              
+                              div#gfrChart(data-dimension="250", data-text="47", data-info="ml/min/1.73m^2", 
+                              data-width="30", data-fontsize="38", data-percent="60", data-fgcolor="#F44336", 
+                              data-bgcolor="#eee",  data-total="100", 
+                              data-icon="long-arrow-up", data-icon-size="28", data-icon-color="#fff")
+                              
             .frame#tabDiagnosis
               table.table.striped.hovered.dataTable#tblDiagnosis
             .frame#tabProcedure
@@ -114,4 +144,6 @@ block content
               table.table.striped.hovered.dataTable#tblDrugs
             .frame#tabCharges
               table.table.striped.hovered.dataTable#tblCharges
+            .frame#tabLabs
+              table.table.striped.hovered.dataTable#tblLabs
               

@@ -9,11 +9,11 @@ block content
       div.cell(style="text-align: center;")
         | วันที่รับบริการ &nbsp;
         div.input-control.text(data-role="datepicker", data-format="dd/mm/yyyy", data-locale="th")
-          input(type="text")
+          input(type="text")#txtDate
           button.button
             span.mif-calendar
         | &nbsp;    
-        button.button.primary แสดง
+        button#btnGetService.button.primary แสดง
         | &nbsp; &nbsp;
         label.switch
           input(type="checkbox", checked="checked")
@@ -26,7 +26,7 @@ block content
       //-       span.mif-search
     div.row
       div.cell.padding10
-        table.table.striped.hovered.dataTable#tblVisit
+        table.table.hovered.dataTable#tblVisit
           //- thead
           //-   tr
           //-     th.sortable-column HN

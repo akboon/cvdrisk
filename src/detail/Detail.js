@@ -1,10 +1,12 @@
 $(function () {
 
-  $('#myStat').circliful();
+  $('#gfrChart').circliful();
+  $('#cvdChart').circliful();
 
   var Q = require('q');
   var fse = require('fs-extra');
   var moment = require('moment');
+  var _ = require('lodash');
 
   var configFile = sysGetConfigFile();
   var config = fse.readJsonSync(configFile);
@@ -109,11 +111,114 @@ $(function () {
       });
 
       return q.promise;
+    },
+    _getVisitDetail: function (vn) {
+      var q = Q.defer();
+      var sql = 'select v.vn, v.hn, v.dx_doctor, d.name as doctor_name,' +
+        'v.pttype, v.pttypeno, v.spclty, sp.name as spclty_name, v.vstdate,  ' +
+        'pt.name as pttype_name, concat(v.pdx, " - ", icd.name) as diag_name ' +
+        'from vn_stat as v  ' +
+        'left join pttype as pt on pt.pttype=v.pttype ' +
+        'left join doctor as d on d.code=v.dx_doctor ' +
+        'left join spclty as sp on sp.spclty=v.spclty ' +
+        'left join icd101 as icd on icd.code=v.pdx ' +
+        'where v.vn=?';
+      db.raw(sql, [vn])
+      .then(function (rows) {
+        q.resolve(rows[0]);
+      })
+      .catch(function (err) {
+        q.reject(err);
+      });
+
+      return q.promise;
+    },
+    _getLabs: function (vn) {
+      var q = Q.defer();
+      var sql = 'select lh.vn, lo.lab_items_code, lo.lab_order_result, ' +
+        'li.lab_items_name, li.lab_items_unit ' +
+        'from lab_order as lo ' +
+        'inner join lab_head as lh on lh.lab_order_number=lo.lab_order_number ' +
+        'left join lab_items as li on li.lab_items_code=lo.lab_items_code ' +
+        'where lh.vn=?';
+      db.raw(sql, [vn])
+      .then(function (rows) {
+        q.resolve(rows[0]);
+      })
+      .catch(function (err) {
+        q.reject(err);
+      });
+
+      return q.promise;
+    },
+    _getChronicClinic: function (hn) {
+      var q = Q.defer();
+      var sql = 'select group_concat(distinct if(c.clinic="001", "DM", if(c.clinic="002", "HT", null))) as chronic ' +
+        'from clinicmember as c ' +
+        'where c.hn=?';
+      db.raw(sql, [hn])
+      .then(function (rows) {
+        q.resolve(rows[0]);
+      })
+      .catch(function (err) {
+        q.reject(err);
+      });
+
+      return q.promise;
+    },
+    _getOpdScreenHistory: function (hn, cholesterol) {
+      var q = Q.defer();
+      var sql = 'select s.vn, s.vstdate, s.bpd, s.bps, concat(s.bps, "/", s.bpd) as bp, s.bw, s.pulse, ' +
+          'case sm.nhso_code ' +
+          '  when 1 or 9 then "N" ' +
+          '  when 2 then "Y" ' +
+          '  when 3 then "Y" ' +
+          '  when 4 then "Y" ' +
+          '  else "N" ' +
+          'END as smoking, ' +
+          'timestampdiff(year, p.birthdate, s.vstdate) as age_year, ' +
+          '(select lo.lab_order_result ' +
+          'from lab_order as lo  ' +
+          'inner join lab_items as li on li.lab_items_code=lo.lab_items_code ' +
+          'inner join lab_head as lh on lo.lab_order_number=lh.lab_order_number ' +
+          'where lh.vn=s.vn ' +
+          'and lo.lab_items_code=?) as cholesterol ' +
+          'from opdscreen as s ' +
+          'inner join person as p on p.patient_hn=s.hn ' +
+          'left join smoking_type as sm on sm.smoking_type_id=s.smoking_type_id ' +
+          'left join drinking_type as dm on dm.drinking_type_id=s.drinking_type_id ' +
+          'where s.hn=? ' +
+          'order by s.vstdate desc ' +
+          'limit 100';
+      db.raw(sql, [cholesterol, hn])
+      .then(function (rows) {
+        q.resolve(rows[0]);
+      })
+      .catch(function (err) {
+        q.reject(err);
+      });
+
+      return q.promise;
     }
   };
 
-  // Get diagnosis
-  Detail._getDiagnosis(vn)
+  Detail._getPatientInfo(hn)
+  .then(function (rows) {
+    var person = rows[0];
+    $('#txtHN').text(person.hn);
+    $('#txtCID').text(person.cid);
+    $('#txtFullname').text(person.ptname);
+    $('#txtAge').text(person.age);
+    $('#txtSex').text(person.sex);
+    $('#txtTypearea').text(person.house_regist_type_name);
+    $('#txtBirth').text(moment(person.birthdate).format('DD/MM/YYYY'));
+    return Detail._getChronicClinic(hn);
+  })
+  .then(function (rows) {
+    console.log(rows);
+    $('#txtChronic').text(rows[0].chronic);
+    return Detail._getDiagnosis(vn);
+  })
   .then(function (rows) {
     $('#tblDiagnosis').DataTable({
       data: rows,
@@ -128,6 +233,14 @@ $(function () {
         "emptyTable": "ไม่พบข้อมูล"
       }
     });
+    return Detail._getVisitDetail(vn);
+  })
+  .then(function (rows) {
+    $('#txtDateServ').val(moment(rows[0].vstdate).format('DD/MM/YYYY'));
+    $('#txtClinic').val(rows[0].spclty_name);
+    $('#txtDoctor').val(rows[0].doctor_name);
+    $('#txtDiag').val(rows[0].diag_name);
+    $('#txtPttype').val(rows[0].pttype + " " + rows[0].pttype_name);
 
     return Detail._getProcedure(vn);
   })
@@ -184,55 +297,122 @@ $(function () {
       }
     });
 
-    return Detail._getPatientInfo(hn);
+    return Detail._getLabs(vn);
   })
   .then(function (rows) {
-    var person = rows[0];
-    $('#txtHN').text(person.hn);
-    $('#txtCID').text(person.cid);
-    $('#txtFullname').text(person.ptname);
-    $('#txtAge').text(person.age);
-    $('#txtSex').text(person.sex);
-    $('#txtTypearea').text(person.house_regist_type_name);
-    $('#txtBirth').text(moment(person.birthdate).format('DD/MM/YYYY'));
+    $('#tblLabs').DataTable({
+      data: rows,
+      columns: [
+        { data: 'lab_items_name', title: 'รายการ' },
+        { data: 'lab_order_result', title: 'ผล' },
+        { data: 'lab_items_unit', title: 'หน่วย' }
+      ],
+      "paging": false,
+      "info": false,
+      "searching": false,
+      language: {
+        "paginate": {
+          "next": "&gt;",
+          "previous": "&lt"
+        },
+        "emptyTable": "ไม่พบข้อมูล",
+        "info": "แสดงหน้า _PAGE_ จาก _PAGES_",
+        "loadingRecords": "กรุณารอซักครู่...",
+        "lengthMenu": "แสดง _MENU_ เรคอร์ด"
+      }
+    });
+    // lab cholesterol = 102
+    return Detail._getOpdScreenHistory(hn, '102');
+  })
+  .then(function (rows) {
 
+    var items = [];
+
+    _.forEach(rows, function (v) {
+      var obj = {};
+      obj.vn = v.vn;
+      obj.vstdate = moment(v.vstdate).format('DD/MM/YYYY');
+      obj.age_year = v.age_year;
+      obj.bp = parseInt(v.bps) + '/' + parseInt(v.bpd);
+      obj.cholesterol = v.cholesterol;
+      obj.smoking = v.smoking == "Y" ? "สูบ" : "ไม่สูบ";
+
+      items.push(obj);
+    });
+
+    $('#tblHistory').DataTable({
+      data: items,
+      "columnDefs": [ {
+        "targets": 0,
+        "visible": false
+      } ],
+      "ordering": false,
+      "order": [[ 0, 'desc' ]],
+      "columns": [
+        { data: 'vn', title: 'VN' },
+        { data: 'vstdate', title: 'วันที่' },
+        { data: 'age_year', title: 'อายุ(ปี)' },
+        { data: 'bp', title: 'ความดัน' },
+        { data: 'cholesterol', title: 'Cholesterol' },
+        { data: 'smoking', title: 'สูบบุหรี่' }
+      ],
+      "paging": true,
+      "info": true,
+      "searching": false,
+      language: {
+        "paginate": {
+          "next": "&gt;",
+          "previous": "&lt"
+        },
+        "emptyTable": "ไม่พบข้อมูล",
+        "info": "แสดงหน้า _PAGE_ จาก _PAGES_",
+        "loadingRecords": "กรุณารอซักครู่...",
+        "lengthMenu": "แสดง _MENU_ เรคอร์ด"
+      }
+    });
   }, function (err) {
     console.log(err);
   });
 
-  var history = [
-    {date_serv: '12/08/2558', age: 45, sbp: 124, cho: 12.5, dm: 'Y', smoke: 'Y'},
-    {date_serv: '15/08/2558', age: 65, sbp: 124, cho: 12.5, dm: 'N', smoke: 'N'},
-    {date_serv: '19/09/2558', age: 50, sbp: 130, cho: 12.5, dm: 'Y', smoke: 'Y'}
+  var cvdchart = [
+    {age: 65, bps: 125, cholesterol: 250, smoking: 'สูบ'}
   ];
 
-  $('#tblHistory').DataTable({
-    data: history,
-    columns: [
-      { data: 'date_serv', title: 'วันที่' },
+  var cretinine = [
+    {age: 65, sex: 'ชาย', cretinine: 0.9, state: 3}
+  ];
+
+  $('#tblCurrentCVDChart').DataTable({
+    data: cvdchart,
+    "ordering": false,
+    "columns": [
       { data: 'age', title: 'อายุ(ปี)' },
-      { data: 'sbp', title: 'ความดัน' },
-      { data: 'cho', title: 'Cholesteral' },
-      { data: 'dm', title: 'เบาหวาน' },
-      { data: 'smoke', title: 'สูบบุหรี่' }
+      { data: 'bps', title: 'BPS' },
+      { data: 'cholesterol', title: 'Chol' },
+      { data: 'smoking', title: 'บุหรี่' }
     ],
-    // "columnDefs": [ {
-    //   "targets": 6,
-    //   "data": null,
-    //   "defaultContent": '<button class="button warning"><span class="mif mif-eye"></span></button>'
-    // }],
-    "paging": true,
-    "info": true,
+    "paging": false,
+    "info": false,
     "searching": false,
     language: {
-      "paginate": {
-        "next": "&gt;",
-        "previous": "&lt"
-      },
-      "emptyTable": "ไม่พบข้อมูล",
-      "info": "แสดงหน้า _PAGE_ จาก _PAGES_",
-      "loadingRecords": "กรุณารอซักครู่...",
-      "lengthMenu": "แสดง _MENU_ เรคอร์ด"
+      "emptyTable": "ไม่พบข้อมูล"
+    }
+  });
+
+  $('#tblCurrentGFRState').DataTable({
+    data: cretinine,
+    "ordering": false,
+    "columns": [
+      { data: 'sex', title: 'เพศ' },
+      { data: 'age', title: 'อายุ(ปี)' },
+      { data: 'cretinine', title: 'Cre.' },
+      { data: 'state', title: 'State' }
+    ],
+    "paging": false,
+    "info": false,
+    "searching": false,
+    language: {
+      "emptyTable": "ไม่พบข้อมูล"
     }
   });
 
