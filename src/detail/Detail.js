@@ -1,7 +1,5 @@
 $(function () {
 
-  $('#gfrChart').circliful();
-  $('#cvdChart').circliful();
 
   var Q = require('q');
   var fse = require('fs-extra');
@@ -166,9 +164,78 @@ $(function () {
 
       return q.promise;
     },
+    _getServiceCVDRisk: function (vn, cholesterol) {
+      var q = Q.defer();
+      var sql = 'select s.bpd, s.bps, concat(round(s.bps), "/", round(s.bpd)) as bp, ' +
+          'case sm.nhso_code ' +
+          '  when 1 or 9 then "N" ' +
+          '  when 2 then "Y" ' +
+          '  when 3 then "Y" ' +
+          '  when 4 then "Y" ' +
+          '  else "N" ' +
+          'END as smoking, ' +
+          'timestampdiff(year, p.birthdate, s.vstdate) as age_year, ' +
+          '(select lo.lab_order_result ' +
+          'from lab_order as lo ' +
+          'inner join lab_items as li on li.lab_items_code=lo.lab_items_code ' +
+          'inner join lab_head as lh on lo.lab_order_number=lh.lab_order_number ' +
+          'where lh.vn=s.vn ' +
+          'and lo.lab_items_code=? limit 1) as cholesterol ' +
+          'from opdscreen as s ' +
+          'inner join person as p on p.patient_hn=s.hn ' +
+          'left join smoking_type as sm on sm.smoking_type_id=s.smoking_type_id ' +
+          'left join drinking_type as dm on dm.drinking_type_id=s.drinking_type_id ' +
+          'where s.vn=? ' +
+          'order by s.vstdate desc ' +
+          'limit 1';
+      db.raw(sql, [cholesterol, vn])
+      .then(function (rows) {
+        q.resolve(rows[0]);
+      })
+      .catch(function (err) {
+        q.reject(err);
+      });
+
+      return q.promise;
+    },
+    _getServiceCretinine: function (vn, cretinine) {
+      var q = Q.defer();
+      var sql = 'select lo.lab_order_result ' +
+      'from lab_order as lo ' +
+      'inner join lab_items as li on li.lab_items_code=lo.lab_items_code ' +
+      'inner join lab_head as lh on lo.lab_order_number=lh.lab_order_number ' +
+      'where lh.vn=? ' +
+      'and lo.lab_items_code=? limit 1';
+      db.raw(sql, [vn, cretinine])
+      .then(function (rows) {
+        q.resolve(rows[0]);
+      })
+      .catch(function (err) {
+        q.reject(err);
+      });
+
+      return q.promise;
+    },
+    _getColor: function (age, sex, chronic, has, bp, cholesterol, smoke) {
+      var q = Q.defer();
+      var sql = 'select color ' +
+        'from colorchart ' +
+        'where has=? and chronic=? and sex=? and age=? and bp=? and smoke=?' +
+        'and cholesterol=?'
+        'limit 1';
+      db.raw(sql, [has, chronic, sex, age, bp, smoke, cholesterol])
+      .then(function (rows) {
+        q.resolve(rows[0]);
+      })
+      .catch(function (err) {
+        q.reject(err);
+      });
+
+      return q.promise;
+    },
     _getOpdScreenHistory: function (hn, cholesterol) {
       var q = Q.defer();
-      var sql = 'select s.vn, s.vstdate, s.bpd, s.bps, concat(s.bps, "/", s.bpd) as bp, s.bw, s.pulse, ' +
+      var sql = 'select s.vn, s.vstdate, s.bpd, s.bps, concat(round(s.bps), "/", round(s.bpd)) as bp, s.bw, s.pulse, ' +
           'case sm.nhso_code ' +
           '  when 1 or 9 then "N" ' +
           '  when 2 then "Y" ' +
@@ -182,7 +249,7 @@ $(function () {
           'inner join lab_items as li on li.lab_items_code=lo.lab_items_code ' +
           'inner join lab_head as lh on lo.lab_order_number=lh.lab_order_number ' +
           'where lh.vn=s.vn ' +
-          'and lo.lab_items_code=?) as cholesterol ' +
+          'and lo.lab_items_code=? limit 1) as cholesterol ' +
           'from opdscreen as s ' +
           'inner join person as p on p.patient_hn=s.hn ' +
           'left join smoking_type as sm on sm.smoking_type_id=s.smoking_type_id ' +
@@ -200,7 +267,9 @@ $(function () {
 
       return q.promise;
     }
-  };
+  }
+
+  var ageService = null;
 
   Detail._getPatientInfo(hn)
   .then(function (rows) {
@@ -215,7 +284,6 @@ $(function () {
     return Detail._getChronicClinic(hn);
   })
   .then(function (rows) {
-    console.log(rows);
     $('#txtChronic').text(rows[0].chronic);
     return Detail._getDiagnosis(vn);
   })
@@ -333,8 +401,8 @@ $(function () {
       obj.vn = v.vn;
       obj.vstdate = moment(v.vstdate).format('DD/MM/YYYY');
       obj.age_year = v.age_year;
-      obj.bps = v.bps == null ? "-" : parseInt(v.bps);
-      obj.bpd = v.bpd == null ? "-" : parseInt(v.bpd);
+      obj.bps = v.bps === null ? "-" : parseInt(v.bps);
+      obj.bpd = v.bpd === null ? "-" : parseInt(v.bpd);
       obj.bp = obj.bps + '/' + obj.bpd;
       obj.cholesterol = v.cholesterol;
       obj.smoking = v.smoking == "Y" ? "สูบ" : "ไม่สูบ";
@@ -372,51 +440,187 @@ $(function () {
         "lengthMenu": "แสดง _MENU_ เรคอร์ด"
       }
     });
+
+    return Detail._getServiceCVDRisk(vn, '102');
+  })
+  .then(function (rows) {
+    //console.log(rows[0]);
+    //age_year: 76bp: "100/70"bpd: 70bps: 100cholesterol: "240"smoking: "N"
+
+
+    if(_.size(rows)) {
+      var data = rows[0];
+      //if(s.bps>=180,180,if(s.bps>=160,160,if(s.bps>=140,140,120)))
+      var bp = data.bps >= 180 ? 180 : data.bps >= 160 ? 160 : data.bps >= 140 ? 140 : 120;
+      var age = data.age_year >= 70 ? 70 : data.age_year >= 60 ? 60 : data.age_year >= 50 ? 50 : 40;
+
+      ageService = data.age_year;
+
+      var cholesterol = data.cholesterol >= 320 ? 320 : data.cholesterol >= 280 ? 280 : data.cholesterol >= 240 ? 240 : data.cholesterol >= 200 ? 200 : 160;
+      var sex = $('#txtSex').text == "ชาย" ? "1" : "2";
+      var has = data.cholesterol === null ? "N" : "Y";
+      var chronic = $('#txtChronic').text === null ? "N" : "Y";
+      var smoke = data.smoking;
+
+      var cvdchart = [
+        {age: data.age_year, bps: data.bps, cholesterol: data.cholesterol, smoking: data.smoking }
+      ];
+
+      $('#tblCurrentCVDChart').DataTable({
+        data: cvdchart,
+        "ordering": false,
+        "columns": [
+          { data: 'age', title: 'อายุ(ปี)' },
+          { data: 'bps', title: 'BPS' },
+          { data: 'cholesterol', title: 'Chol' },
+          { data: 'smoking', title: 'บุหรี่' }
+        ],
+        "paging": false,
+        "info": false,
+        "searching": false,
+        language: {
+          "emptyTable": "ไม่พบข้อมูล"
+        }
+      });
+
+      //
+      // console.log(bp);
+      // console.log(age);
+      // console.log(cholesterol);
+      // console.log(sex);
+      // console.log(has);
+      // console.log(chronic);
+      // console.log(smoke);
+
+      Detail._getColor(age, sex, chronic, has, bp, cholesterol, smoke)
+      .then(function (rows) {
+        var color = rows[0].color
+        var score = color == 1 ? '<10%' :
+          color == 2 ? '10-<20%' :
+          color == 3 ? '20-<30%' :
+          color == 4 ? '30-<40%' :
+          color == 5 ? '>=40%' : 'ERROR';
+
+        var scoreText = color == 1 ? 'ต่ำ' :
+          color == 2 ? 'ปานกลาง' :
+          color == 3 ? 'สูง' :
+          color == 4 ? 'สูงมาก' :
+          color == 5 ? 'อันตราย' : 'ERROR';
+
+          var colorCode = color == 1 ? '#8BC34A' :
+            color == 2 ? '#EEFF41' :
+            color == 3 ? '#FF9800' :
+            color == 4 ? '#FF5722' :
+            color == 5 ? '#BF360C' : '#CFD8DC';
+
+          var scorePercent = color == 1 ? 20 :
+            color == 2 ? 40 :
+            color == 3 ? 60 :
+            color == 4 ? 80 :
+            color == 5 ? 100 : 0;
+
+          $('#cvdChart').data('text', scoreText);
+          $('#cvdChart').data('info', score);
+          $('#cvdChart').data('percent', scorePercent);
+          $('#cvdChart').data('fgcolor', colorCode);
+
+          $('#cvdChart').circliful();
+
+      }, function (err) {
+        console.log(err);
+      });
+
+    }
+
+    return Detail._getServiceCretinine(vn, '78');
+
+  })
+  .then(function (rows) {
+    var result = 0;
+    var cr = 0;
+    var sex = $('#txtSex').text();
+
+    if (_.size(rows)) {
+      var _data = rows[0];
+
+
+      cr = _data.lab_order_result;
+
+      if (sex == "ชาย") {
+        if (cr <= 0.9) {
+          result = 141 * Math.pow((cr/0.9), -0.411) * Math.pow(0.993, ageService);
+        } else {
+          result = 141 * Math.pow((cr/0.9), -1.209) * Math.pow(0.993, ageService);
+        }
+      } else {
+        if (cr <= 0.7) {
+          result = 144 * Math.pow((cr/0.7), -0.329) * Math.pow(0.993, ageService);
+        } else {
+          result = 144 * Math.pow((cr/0.7), -1.209) * Math.pow(0.993, ageService);
+        }
+      }
+    }
+
+    //console.log(parseFloat(result).toFixed(2));
+    var gfr = parseFloat(result).toFixed(2);
+    var ckdState = gfr >= 90 ? '1' :
+      gfr >= 60 ? '2' :
+      gfr >= 30 ? '3' :
+      gfr >= 15 ? '4' :
+      gfr >= 1 ? '5' : '0';
+
+      var scoreText = ckdState == 1 ? 'STATE 1' :
+        ckdState == 2 ? 'STATE 2' :
+        ckdState == 3 ? 'STATE 3' :
+        ckdState == 4 ? 'STATE 4' :
+        ckdState == 5 ? 'STATE 5' : 'ERROR';
+
+      var colorCode = ckdState == 1 ? '#8BC34A' :
+        ckdState == 2 ? '#EEFF41' :
+        ckdState == 3 ? '#FF9800' :
+        ckdState == 4 ? '#FF5722' :
+        ckdState == 5 ? '#BF360C' : '#CFD8DC';
+
+      var scorePercent = ckdState == 1 ? 20 :
+        ckdState == 2 ? 40 :
+        ckdState == 3 ? 60 :
+        ckdState == 4 ? 80 :
+        ckdState == 5 ? 100 : 0;
+
+      $('#gfrChart').data('info', scoreText);
+      $('#gfrChart').data('text', gfr);
+      $('#gfrChart').data('percent', scorePercent);
+      $('#gfrChart').data('fgcolor', colorCode);
+
+      $('#gfrChart').circliful();
+
+      var  _cretinine = [
+        {age: ageService, sex: sex, cretinine: cr, gfr: gfr, state: ckdState}
+      ];
+
+    $('#tblCurrentGFRState').DataTable({
+      data: _cretinine,
+      "ordering": false,
+      "columns": [
+        { data: 'sex', title: 'เพศ' },
+        { data: 'age', title: 'อายุ(ปี)' },
+        { data: 'cretinine', title: 'Cre.' },
+        { data: 'gfr', title: 'GFR' },
+        { data: 'state', title: 'State' }
+      ],
+      "paging": false,
+      "info": false,
+      "searching": false,
+      language: {
+        "emptyTable": "ไม่พบข้อมูล"
+      }
+    });
+
   }, function (err) {
     console.log(err);
   });
 
-  var cvdchart = [
-    {age: 65, bps: 125, cholesterol: 250, smoking: 'สูบ'}
-  ];
 
-  var cretinine = [
-    {age: 65, sex: 'ชาย', cretinine: 0.9, state: 3}
-  ];
-
-  $('#tblCurrentCVDChart').DataTable({
-    data: cvdchart,
-    "ordering": false,
-    "columns": [
-      { data: 'age', title: 'อายุ(ปี)' },
-      { data: 'bps', title: 'BPS' },
-      { data: 'cholesterol', title: 'Chol' },
-      { data: 'smoking', title: 'บุหรี่' }
-    ],
-    "paging": false,
-    "info": false,
-    "searching": false,
-    language: {
-      "emptyTable": "ไม่พบข้อมูล"
-    }
-  });
-
-  $('#tblCurrentGFRState').DataTable({
-    data: cretinine,
-    "ordering": false,
-    "columns": [
-      { data: 'sex', title: 'เพศ' },
-      { data: 'age', title: 'อายุ(ปี)' },
-      { data: 'cretinine', title: 'Cre.' },
-      { data: 'state', title: 'State' }
-    ],
-    "paging": false,
-    "info": false,
-    "searching": false,
-    language: {
-      "emptyTable": "ไม่พบข้อมูล"
-    }
-  });
 
   // initial tabs
   $(".tabcontrol").tabControl();
