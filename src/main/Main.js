@@ -5,7 +5,8 @@ var moment = require('moment');
 
 $(function () {
 
-  $('#txtDateServ').val(moment().format('DD/MM/YYYY'));
+  $('#txtDateServ').data('preset', "2015-08-20");
+  $('#txtDateServ').datepicker();
 
   var configFile = sysGetConfigFile();
   var config = fse.readJsonSync(configFile);
@@ -56,7 +57,7 @@ $(function () {
   });
   // Get service
   var doGetService = function (date) {
-
+    $('#loading').css('display', 'inline');
     Main._getService(date)
     .then(function (rows) {
 
@@ -89,7 +90,9 @@ $(function () {
         }
       });
 
+      $('#loading').css('display', 'none');
     }, function (err) {
+      $('#loading').css('display', 'none');
       console.log(err);
     });
   };

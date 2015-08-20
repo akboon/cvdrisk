@@ -12,7 +12,6 @@ block content
       a(href="../main/Main.html") การให้บริการ
     li
       a(href="#") ข้อมูลการให้บริการ
-
   .grid
     .row.cells5
       .cell
@@ -117,10 +116,14 @@ block content
                               
                             .content(style="background-color: white;")
                               table.table.dataTable#tblCurrentCVDChart
-                              div#cvdChart(data-dimension="250", data-text="<10%", data-info="เสี่ยงต่ำ", 
-                              data-width="30", data-fontsize="38", data-percent="20", data-fgcolor="#00C853", 
-                              data-bgcolor="#eee",  data-total="100", 
-                              data-icon="long-arrow-up", data-icon-size="28", data-icon-color="#fff")
+                              div(style="text-align: center;")
+                                div#cvdChart.circle(data-dimension="200", data-text="<10%", 
+                                data-info="เสี่ยงต่ำ", 
+                                data-width="30", data-fontsize="30", 
+                                data-percent="20", data-fgcolor="#00C853", 
+                                data-bgcolor="#eee",  data-total="100", 
+                                data-icon="long-arrow-up", data-icon-size="28", 
+                                data-icon-color="#fff")
                       .row
                         .cell
                           .panel.collapsible(data-role="panel")
@@ -130,12 +133,12 @@ block content
                             
                             .content(style="background-color: white;")
                               table.table.dataTable#tblCurrentGFRState
-                              
-                              div#gfrChart(data-dimension="250", data-text="47", data-info="ml/min/1.73m^2", 
-                              data-width="30", data-fontsize="38", data-percent="60", data-fgcolor="#F44336", 
-                              data-bgcolor="#eee",  data-total="100", 
-                              data-icon="long-arrow-up", data-icon-size="28", data-icon-color="#fff")
-                              
+                              div(style="text-align: center;")
+                                div#gfrChart.circle(data-dimension="200", data-text="47", data-info="ml/min/1.73m^2", 
+                                data-width="30", data-fontsize="30", data-percent="60", data-fgcolor="#F44336", 
+                                data-bgcolor="#eee",  data-total="100", 
+                                data-icon="long-arrow-up", data-icon-size="28", data-icon-color="#fff")
+                                
             .frame#tabDiagnosis
               table.table.striped.hovered.dataTable#tblDiagnosis
             .frame#tabProcedure

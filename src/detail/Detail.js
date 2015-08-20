@@ -24,7 +24,7 @@ $(function () {
   var Detail = {
     _getDiagnosis: function (vn) {
       var q = Q.defer();
-      var sql = 'select o.vn, concat(o.icd10, " ", icd.name) as diag, ' +
+      var sql = 'select o.vn, concat(o.icd10, " - ", icd.name) as diag, ' +
         ' concat(o.diagtype, " - ", dt.name) as diagtype' +
         ' from ovstdiag as o ' +
         ' left join diagtype as dt on dt.diagtype=o.diagtype ' +
@@ -333,7 +333,9 @@ $(function () {
       obj.vn = v.vn;
       obj.vstdate = moment(v.vstdate).format('DD/MM/YYYY');
       obj.age_year = v.age_year;
-      obj.bp = parseInt(v.bps) + '/' + parseInt(v.bpd);
+      obj.bps = v.bps == null ? "-" : parseInt(v.bps);
+      obj.bpd = v.bpd == null ? "-" : parseInt(v.bpd);
+      obj.bp = obj.bps + '/' + obj.bpd;
       obj.cholesterol = v.cholesterol;
       obj.smoking = v.smoking == "Y" ? "สูบ" : "ไม่สูบ";
 
