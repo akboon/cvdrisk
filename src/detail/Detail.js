@@ -288,6 +288,7 @@ $(function () {
   };
 
   var ageService = null;
+  var isChronic = null;
 
   Detail._getPatientInfo(hn)
   .then(function (rows) {

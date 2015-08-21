@@ -12,7 +12,7 @@ var nwin = ngui.Window.get();
 onload = function() {
     nwin.show();
     nwin.maximize();
-}
+};
 
 var homePath = getHomePath();
 
