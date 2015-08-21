@@ -251,6 +251,23 @@ $(function () {
 
       return q.promise;
     },
+    _checkIsChronic: function (hn) {
+      var q = Q.defer();
+      var sql = 'select * ' +
+        'from ovstdiag ' +
+        'where hn=? ' +
+        'and ((icd10 between "E10" and "E1499") or (icd10 between "I10" and "I109")) ' +
+        'limit 1';
+      db.raw(sql, [hn])
+      .then(function (rows) {
+        q.resolve(rows[0]);
+      })
+      .catch(function (err) {
+        q.reject(err);
+      });
+
+      return q.promise;
+    },
     _getOpdScreenHistory: function (hn, cholesterol) {
       var q = Q.defer();
       var sql = 'select s.vn, s.vstdate, s.bpd, s.bps, concat(round(s.bps), "/", round(s.bpd)) as bp, s.bw, s.pulse, ' +
@@ -288,7 +305,7 @@ $(function () {
   };
 
   var ageService = null;
-  var isChronic = null;
+  var isDM = false;
 
   Detail._getPatientInfo(hn)
   .then(function (rows) {
@@ -300,6 +317,16 @@ $(function () {
     $('#txtSex').text(person.sex);
     $('#txtTypearea').text(person.house_regist_type_name);
     $('#txtBirth').text(moment(person.birthdate).format('DD/MM/YYYY'));
+    return Detail._checkIsChronic(hn);
+  })
+  .then(function (rows) {
+    if (_.size(rows)) {
+      isDM = true;
+      $('#txtIsDM').text('ใช่');
+    } else {
+      isDM = false;
+      $('#txtIsDM').text('ไม่ใช่');
+    }
     return Detail._getChronicClinic(hn);
   })
   .then(function (rows) {
@@ -474,11 +501,13 @@ $(function () {
     var cholesterol = data.cholesterol >= 320 ? 320 : data.cholesterol >= 280 ? 280 : data.cholesterol >= 240 ? 240 : data.cholesterol >= 200 ? 200 : 160;
     var sex = $('#txtSex').text == "ชาย" ? "1" : "2";
     var has = data.cholesterol === null ? "N" : "Y";
-    var chronic = $('#txtChronic').text === null ? "N" : "Y";
+    var dm = isDM ? "Y" : "N";
     var smoke = data.smoking;
 
     var cvdchart = [
-      {age: data.age_year, bps: data.bps, cholesterol: data.cholesterol, smoking: data.smoking }
+      {
+        age: data.age_year, bps: data.bps, cholesterol: data.cholesterol,
+        smoking: data.smoking, dm:  dm}
     ];
 
     $('#tblCurrentCVDChart').DataTable({
@@ -488,6 +517,7 @@ $(function () {
         { data: 'age', title: 'อายุ(ปี)' },
         { data: 'bps', title: 'BPS' },
         { data: 'cholesterol', title: 'Chol' },
+        { data: 'dm', title: 'DM' },
         { data: 'smoking', title: 'บุหรี่' }
       ],
       "paging": false,
@@ -498,7 +528,7 @@ $(function () {
       }
     });
 
-    Detail._getColor(age, sex, chronic, has, bp, cholesterol, smoke)
+    Detail._getColor(age, sex, dm, has, bp, cholesterol, smoke)
     .then(function (rows) {
       var color = rows[0].color;
       var score = color == 1 ? '<10%' :
@@ -619,7 +649,6 @@ $(function () {
         "emptyTable": "ไม่พบข้อมูล"
       }
     });
-
   }, function (err) {
     console.log(err);
   });
