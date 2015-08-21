@@ -34,7 +34,7 @@ $(function () {
         .leftJoin('spclty as s', 's.spclty', 'o.spclty')
         .leftJoin('ovstost as st', 'st.ovstost', 'o.ovstost')
         .where('o.vstdate', date)
-        .where('o.pt_subtype', 1)
+        // .where('o.pt_subtype', 1)
         .orderBy('o.vn')
         .then(function (rows) {
           q.resolve(rows);
