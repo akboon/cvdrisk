@@ -5,6 +5,11 @@
   "description": "My classy app",
   "license": "MIT",
   "main": "app/main/Main.html",
+  "window": {
+    "height": 600,
+    "width": 1010,
+    "toolbar": false
+  },
   "repository": "siteslave/cvdrisk",
   "author": {
     "name": "Satit Rianpit",

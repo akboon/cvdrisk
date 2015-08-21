@@ -3,6 +3,17 @@ var fse = require('fs-extra');
 var fs = require('fs');
 var path = require('path');
 
+// Load native UI library
+var ngui = require('nw.gui');
+
+// Get the current window
+var nwin = ngui.Window.get();
+
+onload = function() {
+    nwin.show();
+    nwin.maximize();
+}
+
 var homePath = getHomePath();
 
 // Check configure path exists

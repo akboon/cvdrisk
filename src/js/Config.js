@@ -14,6 +14,11 @@ var sysGetConfigFile = function () {
   return configFile;
 };
 
+var sysGetConfigPath = function () {
+  var configPath = path.join(homePath, 'cvdrisk');
+  return configPath;
+};
+
 var sysGetUrlParams = function (sParams) {
   var sPageURL = decodeURIComponent(window.location.search.substring(1)),
       sURLVariables = sPageURL.split('&'),
@@ -27,4 +32,4 @@ var sysGetUrlParams = function (sParams) {
           return sParameterName[1] === undefined ? true : sParameterName[1];
       }
   }
-}
+};
