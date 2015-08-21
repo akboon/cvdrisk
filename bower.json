@@ -16,6 +16,7 @@
   "dependencies": {
     "metro": "~3.0.9",
     "datatables": "~1.10.8",
-    "circliful": "~0.1.5"
+    "circliful": "~0.1.5",
+    "js-cookie": "~2.0.3"
   }
 }

@@ -5,8 +5,8 @@ var moment = require('moment');
 
 $(function () {
 
-  $('#txtDateServ').data('preset', "2015-08-20");
-  $('#txtDateServ').datepicker();
+  $('#divDate').data('preset', moment().format('YYYY-MM-DD'));
+  $('#divDate').datepicker();
 
   var configFile = sysGetConfigFile();
   var config = fse.readJsonSync(configFile);
