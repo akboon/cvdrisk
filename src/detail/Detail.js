@@ -649,7 +649,10 @@ $(function () {
         "emptyTable": "ไม่พบข้อมูล"
       }
     });
+
+    $('#loading').css('display', 'none');
   }, function (err) {
+    $('#loading').css('display', 'none');
     console.log(err);
   });
 

@@ -4,6 +4,7 @@ block scripts
   script(src="Detail.js")
   
 block content
+
   ul.breadcrumbs2
     li
       a(href="../main/Main.html")
@@ -12,6 +13,11 @@ block content
       a(href="../main/Main.html") การให้บริการ
     li
       a(href="#") ข้อมูลการให้บริการ
+      
+  .grid.no-margin#loading
+    .row
+      .cell
+        div(data-role="preloader", data-type="metro", data-style="dark", style="margin: auto")
   .grid
     .row.cells5
       .cell

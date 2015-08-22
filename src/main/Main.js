@@ -5,12 +5,25 @@ var moment = require('moment');
 
 $(function () {
 
-  $('#divDate').data('preset', moment().format('YYYY-MM-DD'));
-  $('#divDate').datepicker();
-
   var configFile = sysGetConfigFile();
   var config = fse.readJsonSync(configFile);
   //
+
+  var configPath = sysGetConfigPath();
+  var labConfigFile = path.join(configPath, 'lab.json');
+
+  // Config exists
+  fs.access(labConfigFile, fs.W_OK, function (err) {
+    if (err) {
+      var _config = {
+        cretinine: 78,
+        cholesterol: 102
+      };
+
+      fse.writeJsonSync(labConfigFile, _config);
+    }
+  });
+  
   var db = require('knex')({
     client: 'mysql',
     connection: config.db,
@@ -52,6 +65,7 @@ $(function () {
     e.preventDefault();
 
     var serviceDate = moment($('#txtDate').val(), 'DD/MM/YYYY').format('YYYY-MM-DD');
+    Cookies.set('serviceDate', serviceDate);
 
     doGetService(serviceDate);
   });
@@ -97,9 +111,19 @@ $(function () {
     });
   };
 
-  // initial service list
-  var currentDate = moment().format('YYYY-MM-DD');
-  doGetService(currentDate);
+  var serviceDate = Cookies.get('serviceDate');
+
+  if (serviceDate) {
+    $('#divDate').data('preset', serviceDate);
+    doGetService(serviceDate);
+  } else {
+    // initial service list
+    var currentDate = moment().format('YYYY-MM-DD');
+    $('#divDate').data('preset', currentDate);
+    doGetService(currentDate);
+  }
+
+  $('#divDate').datepicker();
 
   $('#tblVisit').on('click', 'button', function (e) {
     var table = $('#tblVisit').DataTable();
