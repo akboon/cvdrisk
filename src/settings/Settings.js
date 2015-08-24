@@ -12,8 +12,9 @@ $(function () {
     config.database = $('#txtDatabase').val();
     config.user = $('#txtUsername').val();
     config.password = $('#txtPassword').val();
+    config.uploadUrl = $('#txtUploadUrl').val();
 
-    if (!config.host || !config.port || !config.database || !config.user || !config.password) {
+    if (!config.host || !config.port || !config.database || !config.user || !config.password || !config.uploadUrl) {
       $.Notify({
         caption: 'เกิดข้อผิดพลาด',
         content: 'กรุณากรอกข้อมูลให้ครบ',
@@ -52,6 +53,9 @@ $(function () {
         database: config.database,
         user: config.user,
         password: config.password
+      },
+      cloud: {
+        uploadUrl: config.uploadUrl
       }
     };
 
@@ -75,6 +79,7 @@ $(function () {
     $('#txtDatabase').val(config.db.database);
     $('#txtUsername').val(config.db.user);
     $('#txtPassword').val(config.db.password);
+    $('#txtUploadUrl').val(config.cloud.uploadUrl);
 
   };
   // Initial configure data to the form

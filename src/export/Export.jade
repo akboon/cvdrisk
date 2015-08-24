@@ -4,64 +4,49 @@ block scripts
   script(src="Export.js")
 
 block content
-  //- ul.breadcrumbs2
-  //-   li
-  //-     a(href="../main/Main.html")
-  //-       span.icon.mif-home
-  //-   li
-  //-     a(href="../main/Main.html") การให้บริการ
-  //-   li
-  //-     a(href="#") ส่งออกข้อมูล
-  .panel
-    .heading
-      span.icon.mif-floppy-disk
-      span.title ส่งออกข้อมูล
-      
-    .content(style="background-color: white;")
-      .flex-grid
-          .row
-            .cell.size3
-              span ตั้งแต่ &nbsp;
-              div.input-control.text(data-role="datepicker", data-format="dd/mm/yyyy", data-locale="th")
-                input(type="text")#txtStartDate
-                button.button
-                  span.mif-calendar
-            .cell.size3
-              span ถึง &nbsp;
-              div.input-contr ol.text(data-role="datepicker", data-format="dd/mm/yyyy", data-locale="th")
-                input(type="text")#txtEndDate
-                button.button
-                  span.mif-calendar
-            .cell.size4
-              button.button.primary เริ่มส่งออกข้อมูล
+  .flex-grid
+    .row.flex-just-center
+      .cell.size8
+        .panel
+          .heading
+            span.icon.mif-floppy-disk
+            span.title ส่งออกข้อมูล
+            
+          .content
+            .flex-grid
+              .row
+                .cell.size3
+                  span ตั้งแต่ &nbsp;
+                  div.input-control.text(data-role="datepicker", data-format="dd/mm/yyyy", data-locale="th")
+                    input(type="text")#txtStart
+                    button.button
+                      span.mif-calendar
+                .cell.size3
+                  span ถึง &nbsp;
+                  div.input-control.text(data-role="datepicker", data-format="dd/mm/yyyy", data-locale="th")
+                    input(type="text")#txtEnd
+                    button.button
+                      span.mif-calendar
+                .cell.size4
+                  br
+                  button#btnExport.button.primary เริ่มส่งออกข้อมูล
+                  //- .progress.small#pbStart(data-parts="true", data-role="progressBar",
+                  //- data-value="33" data-colors='{"bg-red": 33, "bg-yellow": 66, "bg-cyan": 90, "bg-green": 100}')    
+              
+              br
+              br
+              .row#divUpload
+                .flex-grid
+                  .row
+                    .cell.size8
+                      label ไฟล์พร้อมส่ง
+                      .input-control.file.full-size
+                        input(type="text", readonly="true")#txtFile
+                        button.button.success#btnUpload
+                          span.mif-upload
+        br
+        br
+        .flex-grid#loading
           .row
             .cell.size8
-              .progress.small#pbStart(data-parts="true", data-role="progressBar",
-              data-value="33" data-colors='{"bg-red": 33, "bg-yellow": 66, "bg-cyan": 90, "bg-green": 100}')    
-          .row
-              .flex-grid
-                .row
-                  .cell.size8
-                    table.table.hovered.bordered
-                      thead
-                        tr
-                          th #
-                          th File
-                          th Records
-                      tobdy
-                        tr
-                          td 1
-                          td PERSON.TXT
-                          td 100
-                        tr
-                          td 2
-                          td SERVICE.TXT
-                          td 250
-                        tr
-                          td 3
-                          td DIAG.TXT
-                          td 350
-                        tr
-                          td 4
-                          td LAB.TXT
-                          td 20
+              div(data-role="preloader", data-type="ring", data-style="dark", style="margin: auto")
