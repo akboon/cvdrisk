@@ -195,8 +195,8 @@ $(function () {
           'timestampdiff(year, p.birthdate, s.vstdate) as age_year, ' +
           '(select lo.lab_order_result ' +
           'from lab_order as lo ' +
-          'inner join lab_items as li on li.lab_items_code=lo.lab_items_code ' +
-          'inner join lab_head as lh on lo.lab_order_number=lh.lab_order_number ' +
+          'left join lab_items as li on li.lab_items_code=lo.lab_items_code ' +
+          'left join lab_head as lh on lo.lab_order_number=lh.lab_order_number ' +
           'where lh.vn=s.vn ' +
           'and lo.lab_items_code=? limit 1) as cholesterol ' +
           'from opdscreen as s ' +
@@ -220,8 +220,8 @@ $(function () {
       var q = Q.defer();
       var sql = 'select lo.lab_order_result ' +
       'from lab_order as lo ' +
-      'inner join lab_items as li on li.lab_items_code=lo.lab_items_code ' +
-      'inner join lab_head as lh on lo.lab_order_number=lh.lab_order_number ' +
+      'left join lab_items as li on li.lab_items_code=lo.lab_items_code ' +
+      'left join lab_head as lh on lo.lab_order_number=lh.lab_order_number ' +
       'where lh.vn=? ' +
       'and lo.lab_items_code=? limit 1';
       db.raw(sql, [vn, cretinine])
@@ -281,8 +281,8 @@ $(function () {
           'timestampdiff(year, p.birthdate, s.vstdate) as age_year, ' +
           '(select lo.lab_order_result ' +
           'from lab_order as lo  ' +
-          'inner join lab_items as li on li.lab_items_code=lo.lab_items_code ' +
-          'inner join lab_head as lh on lo.lab_order_number=lh.lab_order_number ' +
+          'left join lab_items as li on li.lab_items_code=lo.lab_items_code ' +
+          'left join lab_head as lh on lo.lab_order_number=lh.lab_order_number ' +
           'where lh.vn=s.vn ' +
           'and lo.lab_items_code=? limit 1) as cholesterol ' +
           'from opdscreen as s ' +
@@ -490,25 +490,46 @@ $(function () {
     return Detail._getServiceCVDRisk(vn, labData.cholesterol);
   })
   .then(function (rows) {
-    console.log(rows[0]);
-    var data = rows[0];
-    //if(s.bps>=180,180,if(s.bps>=160,160,if(s.bps>=140,140,120)))
-    var bp = data.bps >= 180 ? 180 : data.bps >= 160 ? 160 : data.bps >= 140 ? 140 : 120;
-    var age = data.age_year >= 70 ? 70 : data.age_year >= 60 ? 60 : data.age_year >= 50 ? 50 : 40;
+    var cvdchart = [];
 
-    ageService = data.age_year;
+    if (_.size(rows)) {
+      var data = rows[0];
+      //if(s.bps>=180,180,if(s.bps>=160,160,if(s.bps>=140,140,120)))
+      var bp = data.bps >= 180 ? 180 : data.bps >= 160 ? 160 : data.bps >= 140 ? 140 : 120;
+      var age = data.age_year >= 70 ? 70 : data.age_year >= 60 ? 60 : data.age_year >= 50 ? 50 : 40;
 
-    var cholesterol = data.cholesterol >= 320 ? 320 : data.cholesterol >= 280 ? 280 : data.cholesterol >= 240 ? 240 : data.cholesterol >= 200 ? 200 : 160;
-    var sex = $('#txtSex').text == "ชาย" ? "1" : "2";
-    var has = data.cholesterol === null ? "N" : "Y";
-    var dm = isDM ? "Y" : "N";
-    var smoke = data.smoking;
+      ageService = data.age_year;
 
-    var cvdchart = [
-      {
-        age: data.age_year, bps: data.bps, cholesterol: data.cholesterol,
-        smoking: data.smoking, dm:  dm}
-    ];
+      var cholesterol = data.cholesterol >= 320 ? 320 : data.cholesterol >= 280 ? 280 : data.cholesterol >= 240 ? 240 : data.cholesterol >= 200 ? 200 : 160;
+      var sex = $('#txtSex').text == "ชาย" ? "1" : "2";
+      var has = data.cholesterol === null ? "N" : "Y";
+      var dm = isDM ? "Y" : "N";
+      var smoke = data.smoking;
+
+      cvdchart = [
+        {
+          age: data.age_year, bps: data.bps, cholesterol: data.cholesterol,
+          smoking: data.smoking, dm:  dm}
+      ];
+    } else {
+      //if(s.bps>=180,180,if(s.bps>=160,160,if(s.bps>=140,140,120)))
+      var bp = 0;
+      var age = 0
+
+      ageService = 0;
+
+      var cholesterol = 160;
+      var sex = $('#txtSex').text == "ชาย" ? "1" : "2";
+      var has = "N";
+      var dm = isDM ? "Y" : "N";
+      var smoke = "N";
+
+      cvdchart = [
+        {
+          age: 0, bps: 0, cholesterol: 0,
+          smoking: "N", dm:  dm}
+      ];
+    }
 
     $('#tblCurrentCVDChart').DataTable({
       data: cvdchart,
@@ -593,6 +614,9 @@ $(function () {
           result = 144 * Math.pow((cr/0.7), -1.209) * Math.pow(0.993, ageService);
         }
       }
+    } else {
+      result = 0;
+      cr = 0;
     }
 
     //console.log(parseFloat(result).toFixed(2));
