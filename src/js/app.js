@@ -1,4 +1,4 @@
-var getHomePath = require('home-path');
+//var getHomePath = require('home-path');
 var fse = require('fs-extra');
 var fs = require('fs');
 var path = require('path');
@@ -8,16 +8,18 @@ var ngui = require('nw.gui');
 
 // Get the current window
 var nwin = ngui.Window.get();
+var homePath = ngui.App.dataPath;
+console.log(homePath);
 
 onload = function() {
     nwin.show();
     nwin.maximize();
 };
 
-var homePath = getHomePath();
+//var homePath = getHomePath();
 
 // Check configure path exists
-var configPath = path.join(homePath, 'cvdrisk');
+var configPath = path.join(homePath, 'config');
 fse.ensureDirSync(configPath);
 
 // Check configure file exists
@@ -30,6 +32,9 @@ var defaultConfig = {
     database: 'hosxp_pcu',
     user: 'sa',
     password: 'sa'
+  },
+  cloud: {
+    uploadUrl: 'http://kpi.mhkdc.com/upload'
   }
 };
 

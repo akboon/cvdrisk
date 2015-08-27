@@ -6,7 +6,7 @@ var fse = require('fs-extra');
 var _ = require('lodash');
 var request = require('request');
 
-var exportPath = path.join(getHomePath(), "cvdrisk/export");
+var exportPath = path.join(homePath, "export");
 fse.ensureDirSync(exportPath);
 
 var targetFile = path.join(exportPath, 'CVDSCREEN.txt');
