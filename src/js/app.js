@@ -34,7 +34,7 @@ var defaultConfig = {
     password: 'sa'
   },
   cloud: {
-    uploadUrl: 'http://kpi.mhkdc.com/upload'
+    uploadUrl: 'http://kpi.mhkdc.com/upload.php'
   }
 };
 
