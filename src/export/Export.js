@@ -22,6 +22,7 @@ $(function () {
   var db = require('knex')({
     client: 'mysql',
     connection: config.db,
+    character_set_results: 'tis620',
     charset: 'utf8'
   });
 
