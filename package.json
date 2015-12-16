@@ -2,7 +2,7 @@
   "name": "CVDRisk",
   "productName": "CVDRisk",
   "version": "0.0.0",
-  "description": "CVD Risk App",
+  "description": "CVD Risk Screen APP",
   "license": "MIT",
   "main": "app/login/Login.html",
   "window": {
@@ -10,11 +10,11 @@
     "width": 1010,
     "toolbar": true
   },
-  "repository": "siteslave/cvdrisk",
+  "repository": "akboon/cvdrisk",
   "author": {
-    "name": "Satit Rianpit",
-    "email": "siteslave@msn.com",
-    "url": "github.com/siteslave"
+    "name": "Akboon Tanlab",
+    "email": "akboont@gmail.com",
+    "url": "github.com/akboon"
   },
   "keywords": [
     "electron-app"
@@ -24,6 +24,7 @@
     "knex": "^0.8.6",
     "lodash": "^3.10.1",
     "moment": "^2.10.6",
+    "express": "^4.10.6",
     "mysql": "^2.8.0",
     "q": "^1.4.1",
     "q-foreach": "0.0.3",
