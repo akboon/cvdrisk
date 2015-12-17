@@ -1,1 +1,205 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>CVDRisk Screen For HOSxP and HOSxP_PCU 2015-12-16 11:11</title><link rel="stylesheet" href="../../vendor/metro/build/css/metro.min.css"><link rel="stylesheet" href="../../vendor/metro/build/css/metro-icons.min.css"><link rel="stylesheet" href="../../vendor/circliful/css/jquery.circliful.css"><link rel="stylesheet" href="../css/index.css"><script src="../../vendor/jquery/dist/jquery.min.js"></script><script src="../../vendor/datatables/media/js/jquery.dataTables.min.js"></script><script src="../../vendor/metro/build/js/metro.js"></script><script src="../../vendor/circliful/js/jquery.circliful.min.js"></script><script src="../../vendor/js-cookie/src/js.cookie.js"></script><script src="../js/App.js"></script><script src="../js/Config.js"></script><script src="Detail.js"></script></head><body><div data-role="appbar" class="app-bar"><a href="../main/Main.html" class="app-bar-element"><span class="mif-apps mif-2x"> </span>&nbsp; CVD Risk App</a><span class="app-bar-divider"></span><ul class="app-bar-menu"><li><a href="../main/Main.html"><span class="mif-users mif-2x"> </span>&nbsp;ผู้มารับบริการ</a></li><li><a href="#" class="dropdown-toggle"><span class="mif-tools mif-2x"> </span>&nbsp; Tools</a><ul data-role="dropdown" class="d-menu"><li><a href="../lab/Lab.html"><span class="mif-flow-tree mif-lg"> </span>&nbsp; Lab Mapper</a></li><li><a href="../settings/Settings.html"><span class="mif-database mif-lg"> </span>&nbsp; Connection Setting</a></li><li class="divider"></li><li><a href="../export/Export.html"><span class="mif-cabinet mif-lg"> </span>&nbsp; Export Dataset</a></li></ul></li></ul></div><div class="container"><ul class="breadcrumbs2"><li><a href="../main/Main.html"><span class="icon mif-home"></span></a></li><li><a href="../main/Main.html">การให้บริการ</a></li><li><a href="#">ข้อมูลการให้บริการ</a></li></ul><div id="loading" class="grid no-margin"><div class="row"><div class="cell"><div data-role="preloader" data-type="metro" data-style="dark" style="margin: auto"></div></div></div></div><div class="grid"><div class="row cells5"><div class="cell"><div class="panel"><div class="heading"><span class="icon mif-home"></span><span class="title">ข้อมูลผู้รับบริการ</span></div><div class="content"><p> <strong>HN: &nbsp;</strong><span id="txtHN"></span></p><p> <strong>CID: &nbsp;</strong><span id="txtCID"></span></p><p> <strong>ชื่อ: &nbsp;</strong><span id="txtFullname"></span></p><p> <strong>วันเกิด: &nbsp;</strong><span id="txtBirth"></span></p><p><strong>อายุ: </strong><span id="txtAge"></span>&nbsp; (ปี)<strong>&nbsp;เพศ: &nbsp;</strong><span id="txtSex"></span></p><p><strong>Typearea: </strong><p><span id="txtTypearea"></span></p></p><p><strong>ผู้ป่วยเรื้อรัง: &nbsp;</strong><span id="txtChronic" class="bg-magenta fg-white"></span></p><p><strong>ผู้ป่วยเบาหวาน: &nbsp;</strong><span id="txtIsDM" class="bg-magenta fg-white"></span></p></div></div></div><div class="cell colspan4"><div class="tabcontrol"><ul class="tabs"><li><a href="#tabCVDRisk">CVD Risk</a></li><li><a href="#tabDiagnosis">การวินิจฉัย</a></li><li><a href="#tabProcedure">หัตถการ</a></li><li><a href="#tabDrugs">เวชภัณฑ์</a></li><li><a href="#tabCharges">ค่าใช้จ่าย</a></li><li><a href="#tabLabs">ผลตรวจห้องปฏิบัติการ</a></li></ul><div class="frames"><div id="tabCVDRisk" class="frame"><div class="grid"><div class="row cells3"><div class="cell colspan2"><div class="panel"><div class="heading"><span class="icon mif-display"></span><span class="title">ข้อมูลการรับบริการ</span></div><div style="background-color: white;" class="content"><div class="grid"><div class="row cells3"><div class="cell"><label>วันที่</label><div class="input-control text full-size"><input type="text" disabled="disabled" id="txtDateServ"></div></div><div class="cell colspan2"><label>คลินิก</label><div class="input-control text full-size"><input type="text" disabled="disabled" id="txtClinic"></div></div></div><div class="row cells2"><div class="cell"><label>แพทย์ผู้ตรวจ</label><div class="input-control text full-size"><input type="text" disabled="disabled" id="txtDoctor"></div></div><div class="cell"><label>สิทธิ์การรักษา</label><div class="input-control text full-size"><input type="text" disabled="disabled" id="txtPttype"></div></div></div><div class="row"><div class="cell"><label>การวินิจฉัย</label><div class="input-control text full-size"><input type="text" disabled="disabled" id="txtDiag"></div></div></div></div><h3>ประวัติการรับบริการ</h3><hr class="bg-green"><table id="tblHistory" class="table striped hovered dataTable"></table></div></div></div><div class="cell"><div class="grid"><div class="row"><div class="cell"><div data-role="panel" class="panel collapsible"><div class="heading"><span class="icon mif-chart-bars"></span><span class="title">การประมวลผล CVD Risk</span></div><div style="background-color: white;" class="content"><table id="tblCurrentCVDChart" class="table dataTable"></table><div style="text-align: center;"><div id="cvdChart" data-dimension="200" data-text="&lt;10%" data-width="30" data-fontsize="20" data-percent="20" data-fgcolor="#00C853" data-bgcolor="#eee" data-total="100" data-icon="long-arrow-up" data-icon-size="28" data-icon-color="#fff" class="circle"></div></div></div></div></div></div><div class="row"><div class="cell"><div data-role="panel" class="panel collapsible"><div class="heading"><span class="icon mif-chart-bars"></span><span class="title">ค่า eGFR: CKD-EPI</span></div><div style="background-color: white;" class="content"><table id="tblCurrentGFRState" class="table dataTable"></table><div style="text-align: center;"><div id="gfrChart" data-dimension="200" data-text="47" data-info="ml/min/1.73m^2" data-width="30" data-fontsize="30" data-percent="60" data-fgcolor="#F44336" data-bgcolor="#eee" data-total="100" data-icon="long-arrow-up" data-icon-size="28" data-icon-color="#fff" class="circle"></div></div></div></div></div></div></div></div></div></div></div><div id="tabDiagnosis" class="frame"><table id="tblDiagnosis" class="table striped hovered dataTable"></table></div><div id="tabProcedure" class="frame"><table id="tblProcedures" class="table striped hovered dataTable"></table></div><div id="tabDrugs" class="frame"><table id="tblDrugs" class="table striped hovered dataTable"></table></div><div id="tabCharges" class="frame"><table id="tblCharges" class="table striped hovered dataTable"></table></div><div id="tabLabs" class="frame"><table id="tblLabs" class="table striped hovered dataTable"></table></div></div></div></div></div></div></div></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CVDRisk Screen For HOSxP and HOSxP_PCU 2015-12-16 11:11</title>
+<link rel="stylesheet" href="../../vendor/metro/build/css/metro.min.css">
+<link rel="stylesheet" href="../../vendor/metro/build/css/metro-icons.min.css">
+<link rel="stylesheet" href="../../vendor/circliful/css/jquery.circliful.css">
+<link rel="stylesheet" href="../css/index.css">
+<script src="../../vendor/jquery/dist/jquery.min.js"></script>
+<script src="../../vendor/datatables/media/js/jquery.dataTables.min.js"></script>
+<script src="../../vendor/metro/build/js/metro.js"></script>
+<script src="../../vendor/circliful/js/jquery.circliful.min.js"></script>
+<script src="../../vendor/js-cookie/src/js.cookie.js"></script>
+<script src="../js/App.js"></script>
+<script src="../js/Config.js"></script>
+<script src="Detail.js"></script>
+</head>
+<body>
+<div data-role="appbar" class="app-bar">
+    <a href="../main/Main.html" class="app-bar-element">
+    <span class="mif-apps mif-2x"> </span>&nbsp; CVD Risk App</a>
+    <span class="app-bar-divider"></span>
+    <ul class="app-bar-menu">
+    <li><a href="../main/Main.html"><span class="mif-users mif-2x"> </span>&nbsp;ผู้มารับบริการ</a></li>
+    <li><a href="#" class="dropdown-toggle"><span class="mif-tools mif-2x"> </span>&nbsp; Tools</a>
+        <ul data-role="dropdown" class="d-menu">
+        <li><a href="../lab/Lab.html"><span class="mif-flow-tree mif-lg"> </span>&nbsp; Lab Mapper</a></li>
+        <li><a href="../settings/Settings.html"><span class="mif-database mif-lg"> </span>&nbsp; Connection Setting</a></li>
+        <li class="divider"></li>
+        <li><a href="../export/Export.html"><span class="mif-cabinet mif-lg"> </span>&nbsp; Export Dataset</a></li>
+        </ul>
+    </li>
+    </ul>
+</div>
+<div class="container">
+    <ul class="breadcrumbs2">
+    <li><a href="../main/Main.html"><span class="icon mif-home"></span></a></li>
+    <li><a href="../main/Main.html">การให้บริการ</a></li><li><a href="#">ข้อมูลการให้บริการ</a></li>
+    </ul>
+    <div id="loading" class="grid no-margin">
+        <div class="row">
+            <div class="cell">
+                <div data-role="preloader" data-type="metro" data-style="dark" style="margin: auto">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="grid">
+        <div class="row cells5">
+            <div class="cell">
+                <div class="panel">
+                    <div class="heading">
+                        <span class="icon mif-home"></span>
+                        <span class="title">ข้อมูลผู้รับบริการ</span>
+                    </div>
+                    <div class="content">
+                        <p><strong>HN: &nbsp;</strong><span id="txtHN"></span></p>
+                        <p><strong>CID: &nbsp;</strong><span id="txtCID"></span></p>
+                        <p><strong>ชื่อ: &nbsp;</strong><span id="txtFullname"></span></p>
+                        <p><strong>วันเกิด: &nbsp;</strong><span id="txtBirth"></span></p>
+                        <p><strong>อายุ: </strong><span id="txtAge"></span>&nbsp; (ปี)<strong>&nbsp;เพศ: &nbsp;</strong><span id="txtSex"></span></p>
+                        <p><strong>Typearea: </strong><p><span id="txtTypearea"></span></p></p>
+                        <p><strong>ผู้ป่วยเรื้อรัง: &nbsp;</strong><span id="txtChronic" class="bg-magenta fg-white"></span></p>
+                        <p><strong>ผู้ป่วยเบาหวาน: &nbsp;</strong><span id="txtIsDM" class="bg-magenta fg-white"></span></p>
+                    </div>
+                </div>
+            </div>
+            <div class="cell colspan4">
+                <div class="tabcontrol">
+                    <ul class="tabs">
+                        <li><a href="#tabCVDRisk">CVD Risk</a></li>
+                        <li><a href="#tabDiagnosis">การวินิจฉัย</a></li>
+                        <li><a href="#tabProcedure">หัตถการ</a></li>
+                        <li><a href="#tabDrugs">เวชภัณฑ์</a></li>
+                        <li><a href="#tabCharges">ค่าใช้จ่าย</a></li>
+                        <li><a href="#tabLabs">ผลตรวจห้องปฏิบัติการ</a></li>
+                    </ul>
+                    <div class="frames">
+                        <div id="tabCVDRisk" class="frame">
+                            <div class="grid">
+                                <div class="row cells3">
+                                    <div class="cell colspan2">
+                                        <div class="panel">
+                                            <div class="heading">
+                                            <span class="icon mif-display"></span>
+                                            <span class="title">ข้อมูลการรับบริการ</span>
+                                            </div>
+                                            <div style="background-color: white;" class="content">
+                                                <div class="grid">
+                                                    <div class="row cells3">
+                                                        <div class="cell">
+                                                            <label>วันที่</label>
+                                                            <div class="input-control text full-size">
+                                                                <input type="text" disabled="disabled" id="txtDateServ">
+                                                            </div>
+                                                        </div>
+                                                        <div class="cell colspan2">
+                                                            <label>คลินิก</label>
+                                                            <div class="input-control text full-size">
+                                                                <input type="text" disabled="disabled" id="txtClinic">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row cells2">
+                                                        <div class="cell">
+                                                            <label>แพทย์ผู้ตรวจ</label>
+                                                            <div class="input-control text full-size">
+                                                            <input type="text" disabled="disabled" id="txtDoctor">
+                                                            </div>
+                                                        </div>
+                                                        <div class="cell">
+                                                            <label>สิทธิ์การรักษา</label>
+                                                            <div class="input-control text full-size">
+                                                                <input type="text" disabled="disabled" id="txtPttype">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="cell">
+                                                            <label>การวินิจฉัย</label>
+                                                            <div class="input-control text full-size">
+                                                                <input type="text" disabled="disabled" id="txtDiag">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            <h3>ประวัติการรับบริการ</h3>
+                                            <hr class="bg-green">
+                                            <table id="tblHistory" class="table striped hovered dataTable">
+                                            </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="cell">
+                                        <div class="grid">
+                                            <div class="row">
+                                                <div class="cell">
+                                                    <div data-role="panel" class="panel collapsible">
+                                                        <div class="heading">
+                                                        <span class="icon mif-chart-bars"></span>
+                                                        <span class="title">การประมวลผล CVD Risk</span>
+                                                        </div>
+                                                        <div style="background-color: white;" class="content">
+                                                        <table id="tblCurrentCVDChart" class="table dataTable">
+                                                        </table>
+                                                            <div style="text-align: center;">
+                                                                <div id="cvdChart" data-dimension="200" data-text="&lt;10%" data-width="30" data-fontsize="20" data-percent="20" data-fgcolor="#00C853" data-bgcolor="#eee" data-total="100" data-icon="long-arrow-up" data-icon-size="28" data-icon-color="#fff" class="circle">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="cell">
+                                                    <div data-role="panel" class="panel collapsible">
+                                                        <div class="heading">
+                                                        <span class="icon mif-chart-bars"></span>
+                                                        <span class="title">ค่า eGFR: CKD-EPI</span>
+                                                        </div>
+                                                        <div style="background-color: white;" class="content">
+                                                        <table id="tblCurrentGFRState" class="table dataTable"></table>
+                                                            <div style="text-align: center;">
+                                                                <div id="gfrChart" data-dimension="200" data-text="47" data-info="ml/min/1.73m^2" data-width="30" data-fontsize="30" data-percent="60" data-fgcolor="#F44336" data-bgcolor="#eee" data-total="100" data-icon="long-arrow-up" data-icon-size="28" data-icon-color="#fff" class="circle">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="tabDiagnosis" class="frame">
+                        <table id="tblDiagnosis" class="table striped hovered dataTable">
+                        </table>
+                        </div>
+                        <div id="tabProcedure" class="frame">
+                        <table id="tblProcedures" class="table striped hovered dataTable">
+                        </table>
+                        </div>
+                        <div id="tabDrugs" class="frame">
+                        <table id="tblDrugs" class="table striped hovered dataTable">
+                        </table>
+                        </div>
+                        <div id="tabCharges" class="frame">
+                        <table id="tblCharges" class="table striped hovered dataTable">
+                        </table>
+                        </div>
+                        <div id="tabLabs" class="frame">
+                        <table id="tblLabs" class="table striped hovered dataTable">
+                        </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
